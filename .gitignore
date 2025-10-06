@@ -1,11 +1,7 @@
 # .gitignore for Go projects and general development
 # Binaries
 *.exe
-*.dll
-*.so
 *.dylib
-*.test
-*.out
 
 # Build and IDE files
 *.log
@@ -18,41 +14,12 @@
 .vscode/
 
 # Dependency directories
-vendor/
-
-# Go specific
-*.mod
-*.sum
-
-# Reports and generated files
-reports/*.txt
-
-# OS generated files
-Thumbs.db
-
 # Node modules (if any JS)
-node_modules/
-
 # Example files
-example/*.out
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
 *.exe
-*.exe~
-*.dll
 *.so
-*.dylib
-
-# Test binary, built with `go test -c`
 *.test
-
-# Code coverage profiles and other test artifacts
 *.out
-coverage.*
-*.coverprofile
-profile.cov
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -61,9 +28,4 @@ profile.cov
 go.work
 go.work.sum
 
-# env file
-.env
-
-# Editor/IDE
-# .idea/
-# .vscode/
+# env file[![CI Status](https://github.com/ashutoshmishraji/leak-detection-toolkit/workflows/CI/badge.svg)](https://github.com/ashutoshmishraji/leak-detection-toolkit/actions)

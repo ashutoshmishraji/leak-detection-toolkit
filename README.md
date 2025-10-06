@@ -2,10 +2,10 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI Status](https://github.com/yourusername/leakfinder/workflows/CI/badge.svg)](https://github.com/yourusername/leakfinder/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/yourusername/leakfinder)](https://goreportcard.com/report/github.com/yourusername/leakfinder)
-[![Release](https://img.shields.io/github/release/yourusername/leakfinder.svg)](https://github.com/yourusername/leakfinder/releases)
-[![Downloads](https://img.shields.io/github/downloads/yourusername/leakfinder/total.svg)](https://github.com/yourusername/leakfinder/releases)
+[![CI Status](https://github.com/ashutoshmishraji/leakfinder/workflows/CI/badge.svg)](https://github.com/ashutoshmishraji/leakfinder/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ashutoshmishraji/leakfinder)](https://goreportcard.com/report/github.com/ashutoshmishraji/leakfinder)
+[![Release](https://img.shields.io/github/release/ashutoshmishraji/leakfinder.svg)](https://github.com/ashutoshmishraji/leakfinder/releases)
+[![Downloads](https://img.shields.io/github/downloads/ashutoshmishraji/leakfinder/total.svg)](https://github.com/ashutoshmishraji/leakfinder/releases)
 
 **High-performance, production-ready toolkit to detect goroutine and memory leaks in any Go application!**
 
@@ -47,7 +47,7 @@ This comprehensive, optimized toolkit helps you detect both goroutine and memory
 
 ```bash
 # Download latest release for your platform
-curl -L https://github.com/yourusername/leakfinder/releases/latest/download/leakfinder-linux-amd64 -o leakfinder
+curl -L https://github.com/ashutoshmishraji/leakfinder/releases/latest/download/leakfinder-linux-amd64 -o leakfinder
 chmod +x leakfinder
 ./leakfinder help
 ```
@@ -55,14 +55,14 @@ chmod +x leakfinder
 ### Option 2: Install with Go
 
 ```bash
-go install github.com/yourusername/leakfinder@latest
+go install github.com/ashutoshmishraji/leakfinder@latest
 leakfinder help
 ```
 
 ### Option 3: Build from Source
 
 ```bash
-git clone https://github.com/yourusername/leakfinder.git
+git clone https://github.com/ashutoshmishraji/leakfinder.git
 cd leakfinder
 go build -o leakfinder leakfinder.go
 ./leakfinder help
