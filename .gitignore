@@ -1,3 +1,40 @@
+# .gitignore for Go projects and general development
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build and IDE files
+*.log
+*.swp
+*.swo
+*.tmp
+*.bak
+*.DS_Store
+.idea/
+.vscode/
+
+# Dependency directories
+vendor/
+
+# Go specific
+*.mod
+*.sum
+
+# Reports and generated files
+reports/*.txt
+
+# OS generated files
+Thumbs.db
+
+# Node modules (if any JS)
+node_modules/
+
+# Example files
+example/*.out
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
