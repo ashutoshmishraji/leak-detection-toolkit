@@ -35,7 +35,7 @@
        run: go mod verify
  
      - name: Build
-       run: go build -v ./...
+       run: go build -v leakfinder.go
  
      - name: Run tests
        run: go test -v ./...
