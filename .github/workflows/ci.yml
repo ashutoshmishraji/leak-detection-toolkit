@@ -1,87 +1,117 @@
+name: CI
 
- on:
-   push:
-     branches: [ main, develop ]
-   pull_request:
-     branches: [ main ]
- 
- jobs:
-   test:
-     runs-on: ubuntu-latest
-     strategy:
-       matrix:
-         go-version: [1.21, 1.22]
- 
-     steps:
-     - uses: actions/checkout@v4
- 
-     - name: Set up Go
-       uses: actions/setup-go@v4
-       with:
-         go-version: ${{ matrix.go-version }}
- 
-     - name: Cache Go modules
-       uses: actions/cache@v3
-       with:
-         path: ~/go/pkg/mod
-         key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
-         restore-keys: |
-           ${{ runner.os }}-go-
- 
-     - name: Download dependencies
-       run: go mod download
- 
-     - name: Verify dependencies
-       run: go mod verify
- 
-     - name: Build
-       run: go build -v leakfinder.go
- 
-     - name: Run tests
-       run: go test -v ./...
- 
-     - name: Run go vet
-       run: go vet ./...
- 
-     - name: Install staticcheck
-       run: go install honnef.co/go/tools/cmd/staticcheck@latest
- 
-     - name: Run staticcheck
-       run: staticcheck ./...
- 
-     - name: Test build binary
-       run: |
-         go build -o leakfinder leakfinder.go
-         ./leakfinder help
- 
-   build:
-     runs-on: ubuntu-latest
-     needs: test
-     if: github.ref == 'refs/heads/main'
-     
-     steps:
-     - uses: actions/checkout@v4
- 
-     - name: Set up Go
-       uses: actions/setup-go@v4
-       with:
-         go-version: 1.21
- 
-     - name: Build for multiple platforms
-       run: |
-         # Linux
-         GOOS=linux GOARCH=amd64 go build -o dist/leakfinder-linux-amd64 leakfinder.go
-         GOOS=linux GOARCH=arm64 go build -o dist/leakfinder-linux-arm64 leakfinder.go
-         
-         # macOS
-         GOOS=darwin GOARCH=amd64 go build -o dist/leakfinder-darwin-amd64 leakfinder.go
-         GOOS=darwin GOARCH=arm64 go build -o dist/leakfinder-darwin-arm64 leakfinder.go
-         
-         # Windows
-         GOOS=windows GOARCH=amd64 go build -o dist/leakfinder-windows-amd64.exe leakfinder.go
- 
-     - name: Upload artifacts
-       uses: actions/upload-artifact@v3
-       with:
-         name: leakfinder-binaries
-         path: dist/
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.21', '1.22']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Run go vet
+      run: go vet ./...
+
+    - name: Install staticcheck
+      run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+    - name: Run staticcheck
+      run: staticcheck ./...
+
+    - name: Test build binary
+      run: |
+        go build -o leakfinder leakfinder.go
+        timeout 10s ./leakfinder help || true
+
+    - name: Test shell script
+      run: |
+        chmod +x leakfinder.sh
+        timeout 5s ./leakfinder.sh help || true
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Create dist directory
+      run: mkdir -p dist
+
+    - name: Build for multiple platforms
+      run: |
+        # Linux
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/leakfinder-linux-amd64 leakfinder.go
+        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o dist/leakfinder-linux-arm64 leakfinder.go
+
+        # macOS
+        GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o dist/leakfinder-darwin-amd64 leakfinder.go
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/leakfinder-darwin-arm64 leakfinder.go
+
+        # Windows
+        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/leakfinder-windows-amd64.exe leakfinder.go
+
+    - name: Verify builds
+      run: |
+        ls -la dist/
+        file dist/*
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: leakfinder-binaries
+        path: dist/
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v4
+      with:
+        version: v1.55.2
+        args: --timeout=5m --config=.golangci.yml

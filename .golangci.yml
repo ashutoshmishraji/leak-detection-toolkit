@@ -1,0 +1,97 @@
+run:
+   timeout: 5m
+   issues-exit-code: 1
+   tests: true
+ 
+ output:
+   format: colored-line-number
+   print-issued-lines: true
+   print-linter-name: true
+ 
+ linters-settings:
+   errcheck:
+     check-type-assertions: true
+     check-blank: true
+   
+   govet:
+     check-shadowing: true
+     enable-all: true
+   
+   gocyclo:
+     min-complexity: 15
+   
+   maligned:
+     suggest-new: true
+   
+   dupl:
+     threshold: 100
+   
+   goconst:
+     min-len: 3
+     min-occurrences: 3
+   
+   misspell:
+     locale: US
+   
+   lll:
+     line-length: 120
+   
+   goimports:
+     local-prefixes: github.com/yourusername/leakfinder
+   
+   gocritic:
+     enabled-tags:
+       - performance
+       - style
+       - experimental
+     disabled-checks:
+       - wrapperFunc
+       - hugeParam
+ 
+ linters:
+   enable:
+     - errcheck
+     - gosimple
+     - govet
+     - ineffassign
+     - staticcheck
+     - typecheck
+     - unused
+     - gocyclo
+     - gofmt
+     - goimports
+     - misspell
+     - goconst
+     - gocritic
+     - gosec
+     - lll
+   
+   disable:
+     - maligned  # deprecated
+     - scopelint # deprecated
+ 
+ issues:
+   exclude-rules:
+     # Exclude some linters from running on tests files
+     - path: _test\.go
+       linters:
+         - gocyclo
+         - errcheck
+         - dupl
+         - gosec
+     
+     # Exclude known linter issues
+     - text: "weak cryptographic primitive"
+       linters:
+         - gosec
+     
+     # Exclude shadow checking on err variables
+     - text: "shadow: declaration of \"err\""
+       linters:
+         - govet
+   
+   # Maximum issues count per one linter
+   max-issues-per-linter: 0
+   
+   # Maximum count of issues with the same text
+   max-same-issues: 0

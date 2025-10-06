@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Get version
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Create dist directory
+      run: mkdir -p dist
+
+    - name: Build binaries
+      run: |
+        # Linux
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" -o dist/leakfinder-linux-amd64 leakfinder.go
+        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" -o dist/leakfinder-linux-arm64 leakfinder.go
+
+        # macOS
+        GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" -o dist/leakfinder-darwin-amd64 leakfinder.go
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" -o dist/leakfinder-darwin-arm64 leakfinder.go
+
+        # Windows
+        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.VERSION }}" -o dist/leakfinder-windows-amd64.exe leakfinder.go
+
+    - name: Create checksums
+      run: |
+        cd dist
+        sha256sum * > checksums.txt
+        cat checksums.txt
+
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        if [ -f CHANGELOG.md ]; then
+          # Extract release notes from CHANGELOG.md
+          awk '/^## \[.*\]/{if(found) exit; found=1; next} found && /^## /{exit} found' CHANGELOG.md > release_notes.md
+        else
+          echo "Release ${{ steps.version.outputs.VERSION }}" > release_notes.md
+        fi
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/*
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
